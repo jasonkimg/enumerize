@@ -83,7 +83,7 @@ module Enumerize
       mod.module_eval <<-RUBY, __FILE__, __LINE__ + 1
         def #{name}
           if defined?(super)
-            if super.is_number?
+            if super.to_s.is_number?
               super
             else
               self.class.enumerized_attributes[:#{name}].find_value(super)
