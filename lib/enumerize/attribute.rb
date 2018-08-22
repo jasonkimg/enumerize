@@ -20,7 +20,7 @@ module Enumerize
       @values = Array(options[:in]).map { |v| value_class.new(self, *v).freeze }
 
       @value_hash = Hash[@values.map { |v| [v.value.to_s, v] }]
-      @value_hash.merge! Hash[@values.map { |v| [v.to_s, v] }]
+      @value_hash.merge! Hash[@values.select(&:not_a_number?).map { |v| [v.to_s, v] }]
 
       if options[:default]
         @default_value = find_default_value(options[:default])
@@ -83,7 +83,11 @@ module Enumerize
       mod.module_eval <<-RUBY, __FILE__, __LINE__ + 1
         def #{name}
           if defined?(super)
-            self.class.enumerized_attributes[:#{name}].find_value(super)
+            if super.is_number?
+              super
+            else
+              self.class.enumerized_attributes[:#{name}].find_value(super)
+            end
           elsif respond_to?(:read_attribute)
             self.class.enumerized_attributes[:#{name}].find_value(read_attribute(:#{name}))
           else

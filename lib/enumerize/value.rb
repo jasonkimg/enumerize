@@ -31,6 +31,14 @@ module Enumerize
       coder.represent_object(self.class.superclass, @value)
     end
 
+    def is_number?
+      true if Float(self) rescue false
+    end
+
+    def not_a_number?
+      !is_number?
+    end
+
     private
 
     def predicate_call(value)
